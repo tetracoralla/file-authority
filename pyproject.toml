@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "openadam-file-authority"
+version = "0.2.0"
+description = "Workspace-relative file authority for Agent tools: path validation, symlink-rejecting resolution, output preflight, and atomic single-file publication"
+readme = "README.md"
+authors = [{ name = "openAdam" }]
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=9,<10",
+  "ruff>=0.12,<1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/file_authority"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
