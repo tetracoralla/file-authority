@@ -1,0 +1,32 @@
+{
+  "schema": "openadam.release-profile",
+  "version": "0.1",
+  "distribution": {
+    "source": "public",
+    "audience": "public"
+  },
+  "carriers": [
+    {
+      "id": "github-release",
+      "required": true
+    },
+    {
+      "id": "github-actions",
+      "required": true,
+      "workflows": [
+        "ci.yml",
+        "codeql.yml",
+        "release.yml"
+      ]
+    }
+  ],
+  "intentionalAbsences": [],
+  "pythonPackage": {
+    "registry": "https://pypi.org/",
+    "name": "openadam-file-authority",
+    "formats": [
+      "wheel",
+      "sdist"
+    ]
+  }
+}

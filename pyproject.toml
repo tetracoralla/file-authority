@@ -4,18 +4,29 @@ build-backend = "hatchling.build"
 
 [project]
 name = "openadam-file-authority"
-version = "0.2.0"
+version = "0.2.1"
 description = "Workspace-relative file authority for Agent tools: path validation, symlink-rejecting resolution, output preflight, and atomic single-file publication"
 readme = "README.md"
 authors = [{ name = "openAdam" }]
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.11"
+classifiers = [
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Homepage = "https://github.com/tetracoralla/file-authority"
+Repository = "https://github.com/tetracoralla/file-authority"
+Issues = "https://github.com/tetracoralla/file-authority/issues"
 
 [project.optional-dependencies]
 dev = [
   "pytest>=9,<10",
   "ruff>=0.12,<1",
+  "build>=1.2,<2",
 ]
 
 [tool.hatch.build.targets.wheel]

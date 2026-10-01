@@ -93,9 +93,35 @@ unchanged. Scheme-prefixed names (`notes:v1.png`) are refused everywhere.
 
 ## Install
 
-Apache-2.0, Python ≥ 3.11, zero runtime dependencies, works from an installed
-wheel without a sibling checkout. Unpublished candidates are consumed by
-pinned wheel plus recorded digest (uv records the wheel hash in `uv.lock`).
+Install the versioned [GitHub release artifact](https://github.com/tetracoralla/file-authority/releases/tag/v0.2.1) directly:
+
+```sh
+python -m pip install https://github.com/tetracoralla/file-authority/releases/download/v0.2.1/openadam_file_authority-0.2.1-py3-none-any.whl
+```
+
+Once this version is available on PyPI, registry installation is:
+
+```sh
+python -m pip install openadam-file-authority==0.2.1
+```
+
+```python
+from pathlib import Path
+from file_authority import anchor_root, open_input_file
+
+# The application chooses and grants the workspace root.
+with anchor_root(Path("./workspace")) as root:
+    with open_input_file(root, "input.txt", max_bytes=1_000_000) as source:
+        data = source.read_bytes()
+```
+
+Apache-2.0, Python >= 3.11, zero runtime dependencies. Supported systems are
+macOS and Linux: the implementation uses descriptor-relative filesystem APIs,
+`O_NOFOLLOW`, and platform-specific exclusive directory rename. It is not a
+Windows filesystem authority implementation. CI exercises the minimum Python
+version and a current Python version on both supported systems. Importing an
+installed wheel requires no sibling checkout. Offline builds may vendor the
+verified release wheel; lockfiles retain its digest. See [RELEASING.md](RELEASING.md).
 
 ## Development
 
@@ -103,5 +129,6 @@ pinned wheel plus recorded digest (uv records the wheel hash in `uv.lock`).
 uv sync --extra dev
 uv run pytest
 uv run ruff check .
+uv run python scripts/check-package.py
 uv build
 ```
