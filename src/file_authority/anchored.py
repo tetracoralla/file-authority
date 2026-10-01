@@ -75,22 +75,23 @@ class AnchoredDirectory:
     def materialized_path(self, *, error: ErrorFactory = default_error) -> str:
         """Return a real path that currently resolves to this directory.
 
-        On Linux the live descriptor path is read from ``/proc/self/fd``;
-        otherwise the path remembered from anchoring is used. Either way the
-        binding is re-verified by inode before the path is returned, so a
-        component swapped or renamed after anchoring fails safely instead of
-        handing out a path that now leads elsewhere.
+        A remembered pathname must still identify the anchored directory. Never
+        recover from its replacement by returning the object's relocated path:
+        callers taking a pathname depend on the original binding still existing.
+        Descriptor-only directories can use Linux ``/proc/self/fd`` when no
+        original pathname was supplied. Every returned binding is inode-verified.
         """
 
         if self.fd < 0:
             raise error("PATH_FORBIDDEN", "anchored directory is already closed")
         candidates: list[str] = []
-        proc_path = f"/proc/self/fd/{self.fd}"
-        if os.path.exists(proc_path):
-            with suppress(OSError):
-                candidates.append(os.readlink(proc_path))
         if self._remembered_path:
             candidates.append(self._remembered_path)
+        else:
+            proc_path = f"/proc/self/fd/{self.fd}"
+            if os.path.exists(proc_path):
+                with suppress(OSError):
+                    candidates.append(os.readlink(proc_path))
         anchored = os.fstat(self.fd)
         for path in candidates:
             if not path or path.endswith(" (deleted)"):

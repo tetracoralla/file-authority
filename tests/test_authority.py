@@ -374,6 +374,26 @@ def test_materialized_path_fails_safely_after_replacement(workspace: Path) -> No
     assert caught.value.code == "PATH_FORBIDDEN"
 
 
+def test_materialized_path_cannot_recover_a_replaced_binding_from_proc(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    with anchor_root(workspace / "out") as directory:
+        moved = workspace / "out-moved"
+        (workspace / "out").rename(moved)
+        (workspace / "out").mkdir()
+        proc = f"/proc/self/fd/{directory.fd}"
+        original_exists, original_readlink = os.path.exists, os.readlink
+        monkeypatch.setattr(
+            os.path, "exists", lambda name: name == proc or original_exists(name),
+        )
+        monkeypatch.setattr(
+            os, "readlink", lambda name: str(moved) if name == proc else original_readlink(name),
+        )
+        with pytest.raises(FileAuthorityError) as caught:
+            directory.materialized_path()
+        assert caught.value.code == "PATH_FORBIDDEN"
+
+
 @pytest.mark.parametrize("name", ["../outside", "/tmp/outside", "nested/file", ".", ".."])
 def test_child_operations_refuse_paths_before_io(workspace: Path, name: str) -> None:
     with anchor_root(workspace) as directory:
